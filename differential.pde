@@ -4,7 +4,9 @@ String xstart="-10";
 String xend="10";
 String ystart="-10";
 String yend="10";
-int numofsteps=10;
+int numofsteps=30;
+float xshift=0;
+float yshift=0;
 void setup(){
   size(950,700);
   background(250);
@@ -34,6 +36,8 @@ public void generateField(){
      }
   }
   Field.update(xexp,yexp);
+  xshift=(float)(dxend-dxstart);
+  yshift=(float)(dyend-dystart);
 }
 public void drawField(){
     strokeWeight(1);
