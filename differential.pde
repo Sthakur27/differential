@@ -186,7 +186,7 @@ void keyPressed(){
      }
    }
    if(key=='c'||key=='C'){
-      Particle.allParticles.clear();  Particle.num=-1;
+      Particle.allParticles.clear();  Particle.num=-1; displaynum=0;
    }
    if(typing==0){
        if(key=='x' || key=='X'){
@@ -220,6 +220,7 @@ void keyPressed(){
       if(displaynum>=Particle.allParticles.size()-1){displaynum=0;}
      else{displaynum++;}
    }
+   if(key=='t'||key=='T'){starttime=millis();}
    if(key=='['){Particle.speed-=0.05;}
    if(key==']'){Particle.speed+=0.05;}
    if(key=='r'||key=='R'){xstart="-5";xend="5";ystart="-5";yend="5"; displaynum=0; Particle.num=-1;
