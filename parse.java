@@ -9,6 +9,7 @@ public class parse{
     private static String type3="()";
     private static String type4="cossintanlogcoshsinh"; //cos  sin tan log
     private static String all="E0123456789.ep+-*/^cossintanlogcoshsinhuv()xyz";
+    private static String vars="xyzuv";
     private static ArrayList<pObj> pobs=new ArrayList<>();
     static ArrayList<Double> xreturnlist=new ArrayList<>();
     static ArrayList<Double> yreturnlist=new ArrayList<>();
@@ -16,6 +17,17 @@ public class parse{
     static String ystring;
 
     
+    public static String correctSyntax(String str){
+       if(str.length()>1){
+         for(int i=1;i<str.length();i++){
+            //if before var there is a var or a number add a '*'
+            if((vars.indexOf(str.substring(i-1,i))!=-1 || type1.indexOf(str.substring(i-1,i))!=-1) && vars.indexOf(str.substring(i,i+1))!=-1){
+                str=str.substring(0,i)+"*"+str.substring(i);
+            }
+         }
+       }  
+       return(str);
+    }
     
     //interprets and parses a string with no variables.  ex "4-3^0.02"
     public static double interp(String str){

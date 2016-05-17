@@ -1,11 +1,12 @@
-String xexp="3*x-x*y";
+//http://www.softmath.com/tutorials-3/algebra-formulas/articles_imgs/8907/matrix59.jpg
+String xexp="2x-xy";
 String tempxexp=xexp;
-String yexp="x*y-3*y";
+String yexp="xy-2y";
 String tempyexp=yexp;
-String xstart="-1";
-String xend="5";
-String ystart="-1";
-String yend="5";
+String xstart="-0.5";
+String xend="4.5";
+String ystart="-0.5";
+String yend="4.5";
 int numofsteps=30;
 float xshift=0;
 float yshift=0;
@@ -14,13 +15,10 @@ boolean clicktype=false;
 boolean paused=false;
 double dxstart,dxend,dxstep,xscale,dystart,dyend,dystep,yscale;
 void setup(){
-  size(950,700);
+  size(850,700);
   background(250);
   frameRate(60);
   generateField();
-  //scale(1, -1);
-  //translate(0, -height);
-  //println(Field.wholeField.get(0));
 }
 
 void draw(){
@@ -28,21 +26,24 @@ void draw(){
   fill(0);
   textSize(12);
   if(paused){
-    text("Paused",830,300);
+    text("Paused",730,300);
   }
+  
   if (typing==1){fill(#f42121);} else{fill(0);}
-  text("dx/dt= "+tempxexp,830,60);
+  text("dx/dt= "+tempxexp,730,60);
   if (typing==2){fill(#f42121);} else{fill(0);}
-  text("dy/dt= "+tempyexp,830,90);
+  text("dy/dt= "+tempyexp,730,90);
   if (typing==3){fill(#f42121);} else{fill(0);}
-  text("x start= "+xstart,830,150);
+  text("x start= "+xstart,730,150);
   if (typing==4){fill(#f42121);} else{fill(0);}
-  text("x end= "+xend,830,170);
+  text("x end= "+xend,730,170);
   if (typing==5){fill(#f42121);} else{fill(0);}
-  text("y start= "+ystart,830,190);
+  text("y start= "+ystart,730,190);
   if (typing==6){fill(#f42121);} else{fill(0);}
-  text("y end= "+yend,830,210);
-  line(815,0,815,700);
+  text("y end= "+yend,730,210);
+  text("Speed= "+Particle.speed,730,350);
+  
+  line(715,0,715,700);
   scale(1, -1);
   translate(0, -height);
   translate((float)(-1*dxstart*xscale),(float)(-1*dystart*yscale));
@@ -53,20 +54,14 @@ void draw(){
 }
 public void generateField(){
   Field.wholeField.clear();
-   dxstart=parse.interp(xstart);
-   dxend=parse.interp(xend);
-   dxstep=(dxend-dxstart)/numofsteps;
-   dystart=parse.interp(ystart);
-   dyend=parse.interp(yend);
-   dystep=(dyend-dystart)/numofsteps;
-   yscale=(700/(dyend-dystart));
-   xscale=(800/(dxend-dxstart));
+   dxstart=parse.interp(xstart);   dxend=parse.interp(xend);   dxstep=(dxend-dxstart)/numofsteps;  
+   dystart=parse.interp(ystart);   dyend=parse.interp(yend);   dystep=(dyend-dystart)/numofsteps;
+   yscale=(700/(dyend-dystart));   xscale=(700/(dxend-dxstart));
   for (double i=dxstart;i<=dxend+(dxstep/2);i+=dxstep){
      for (double j=dystart;j<=dyend+(dystep/2);j+=dystep){
           new Field((float)i,(float)j);
      }
   }
- // new Field(3,5);
   Field.update(xexp,yexp);
   scaleField();
 }
@@ -77,7 +72,7 @@ public void scaleField(){
   } 
 }
 public void drawField(){
-  stroke(#147efb);
+  stroke(#cc00ff);
     strokeWeight(1);
     for (Field f:Field.wholeField){
         if(f.vectorexists){
@@ -92,10 +87,12 @@ public void drawParticles(){
       if(!paused){
       p.velocityUpdate(xexp,yexp);
       p.posUpdate();}
-      fill(#ff0000);      
+      fill(p.r,p.g,p.b); 
+      stroke(p.r,p.g,p.b);
       for(int i=1;i<p.trail.size();i++){
          line((float)(p.trail.get(i-1).xpos*xscale),(float)(p.trail.get(i-1).ypos*yscale),(float)(p.trail.get(i).xpos*xscale),(float)(p.trail.get(i).ypos*yscale));
       }
+      stroke(0,0,0);
       ellipse((float)(p.xpos*xscale),(float)(p.ypos*yscale),10,10);
    }
 }
@@ -106,6 +103,22 @@ public void drawArrow(float x, float y,float angle, Vector v){
     line(x2,y2,x2+5*cos(angle-(5*PI/6)),y2+5*sin(angle-(5*PI/6)));
     line(x2,y2,x2+5*cos(angle+(5*PI/6)),y2+5*sin(angle+(5*PI/6)));          
 }
+public void shift(float x,float y){
+   double xwidth=(dxend-dxstart);
+   xend=Double.toString(dxend+xwidth*x);
+   xstart=Double.toString(dxstart+xwidth*x);
+   double ywidth=(dyend-dystart);
+   yend=Double.toString(dyend+ywidth*y);
+   ystart=Double.toString(dystart+ywidth*y);
+   generateField();
+}
+public void zoom(float amt){
+   xend=Double.toString(dxend*amt);
+   xstart=Double.toString(dxstart*amt);
+   yend=Double.toString(dyend*amt);
+   ystart=Double.toString(dystart*amt);
+   generateField();
+}
 void keyPressed(){
    if(keyCode==ENTER){
        if(clicktype){typing=0; clicktype=false;}
@@ -115,7 +128,7 @@ void keyPressed(){
            else if(typing==1){
            tempyexp=""; typing++;}
            else if(typing==2){ 
-              typing=0; yexp=tempyexp;  xexp=tempxexp; generateField();}
+              typing=0; yexp=tempyexp;  xexp=tempxexp; Particle.allParticles.clear(); generateField();}
            else if(typing==3){ 
               typing=4; xend="";}
            else if(typing==4){
@@ -149,7 +162,7 @@ void keyPressed(){
      }
    }
    if(key=='c'||key=='C'){
-      Particle.allParticles.clear();
+      Particle.allParticles.clear();  Particle.num=-1;
    }
    if(typing==0){
        if(key=='x' || key=='X'){
@@ -175,15 +188,23 @@ void keyPressed(){
       }
    }
    if(typing==0){
-      if(key=='p' || key=='P'){
+      if(key=='p' || key=='P' || keyCode==BACKSPACE){
          if(paused){paused=false;} else{paused=true;}
       }
    }
+   if(key=='['){Particle.speed-=0.05;}
+   if(key==']'){Particle.speed+=0.05;}
+   if(key=='r'||key=='R'){xstart="-5";xend="5";ystart="-5";yend="5"; Particle.allParticles.clear(); generateField();}
+   if(keyCode==LEFT){shift(-0.1,0);}if(keyCode==RIGHT){shift(0.1,0);}
+   if(keyCode==UP){shift(0,0.1);}if(keyCode==DOWN){shift(0,-0.1);}
+}
+void mouseWheel(MouseEvent event){
+  int e=event.getCount();
+  if(e<0){  zoom(0.95);  }
+  else{ zoom(1/0.95);}
 }
 void mouseClicked(){
    float xvar=mouseX;
    float yvar=700-mouseY;
-   new Particle(((dxend-dxstart)*xvar/800)+dxstart,((dyend-dystart)*yvar/700)+dystart);  
-   //System.out.println(((dxend-dxstart)*xvar/800)+dxstart);
-   //System.out.println(((dyend-dystart)*yvar/700)+dystart);
+   new Particle(((dxend-dxstart)*xvar/700)+dxstart,((dyend-dystart)*yvar/700)+dystart);  
 }
