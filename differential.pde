@@ -8,11 +8,14 @@ String xend="4.5";
 String ystart="-0.5";
 String yend="4.5";
 int numofsteps=30;
+float starttime=millis();
+float time=0;
 float xshift=0;
 float yshift=0;
 int typing=0;
 boolean clicktype=false;
 boolean paused=false;
+int displaynum=0;
 double dxstart,dxend,dxstep,xscale,dystart,dyend,dystep,yscale;
 void setup(){
   size(850,700);
@@ -27,6 +30,7 @@ void draw(){
   textSize(12);
   if(paused){
     text("Paused",730,300);
+    starttime=millis()-time*1000;
   }
   
   if (typing==1){fill(#f42121);} else{fill(0);}
@@ -42,7 +46,25 @@ void draw(){
   if (typing==6){fill(#f42121);} else{fill(0);}
   text("y end= "+yend,730,210);
   text("Speed= "+Particle.speed,730,350);
+  time=(millis()-starttime)/1000;
+  text(time+"s",730,400);
   
+   //draw display particle
+  if (Particle.allParticles.size()>displaynum){
+      text("Particle Info:",730,470);
+      text("Particle #"+(displaynum+1),730,490);
+      text("Position: ("+String.format("%.1f",Particle.allParticles.get(displaynum).xpos)+","+String.format("%.1f",Particle.allParticles.get(displaynum).ypos)+")",730,550);
+      text("Velocity Vector:",730,570);
+      float[] temp=Particle.allParticles.get(displaynum).instantaneousVelocity(xexp,yexp);
+      text(String.format("%.2f",temp[0])+"i + "+ String.format("%.2f",temp[1])+"j",730,590);
+      text("Speed= "+String.format("%.4f",pow(temp[1]*temp[1]+temp[0]*temp[0],0.5)),730,610);
+      //draw the selected particle
+      
+      //draw the displayedparticle
+          fill(Particle.allParticles.get(displaynum).r,Particle.allParticles.get(displaynum).g,Particle.allParticles.get(displaynum).b);
+         ellipse(740,520,10,10);
+   }
+   
   line(715,0,715,700);
   scale(1, -1);
   translate(0, -height);
@@ -51,6 +73,8 @@ void draw(){
   line((float)(dxstart*xscale),0,(float)(dxend*xscale),0);
   drawField();  
   drawParticles();
+  
+
 }
 public void generateField(){
   Field.wholeField.clear();
@@ -192,9 +216,14 @@ void keyPressed(){
          if(paused){paused=false;} else{paused=true;}
       }
    }
+   if(key=='n'||key=='N'){
+      if(displaynum>=Particle.allParticles.size()-1){displaynum=0;}
+     else{displaynum++;}
+   }
    if(key=='['){Particle.speed-=0.05;}
    if(key==']'){Particle.speed+=0.05;}
-   if(key=='r'||key=='R'){xstart="-5";xend="5";ystart="-5";yend="5"; Particle.allParticles.clear(); generateField();}
+   if(key=='r'||key=='R'){xstart="-5";xend="5";ystart="-5";yend="5"; displaynum=0; Particle.num=-1;
+      Particle.allParticles.clear(); generateField(); starttime=millis(); }
    if(keyCode==LEFT){shift(-0.1,0);}if(keyCode==RIGHT){shift(0.1,0);}
    if(keyCode==UP){shift(0,0.1);}if(keyCode==DOWN){shift(0,-0.1);}
 }
@@ -206,5 +235,6 @@ void mouseWheel(MouseEvent event){
 void mouseClicked(){
    float xvar=mouseX;
    float yvar=700-mouseY;
-   new Particle(((dxend-dxstart)*xvar/700)+dxstart,((dyend-dystart)*yvar/700)+dystart);  
+   Particle p=new Particle(((dxend-dxstart)*xvar/700)+dxstart,((dyend-dystart)*yvar/700)+dystart); 
+   displaynum=Particle.allParticles.indexOf(p);
 }

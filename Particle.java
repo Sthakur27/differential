@@ -29,6 +29,18 @@ public class Particle{
         this.g=greencolorlist[num];
         this.b=bluecolorlist[num];
     }
+    public float[] instantaneousVelocity(String xexp,String yexp){
+         float[] returnvals={0,0};
+         xexp=parse.correctSyntax(xexp);
+         yexp=parse.correctSyntax(yexp);
+         String str=xexp.replaceAll("x","("+Double.toString(xpos)+")");
+         str=str.replaceAll("y","("+Double.toString(ypos)+")");
+         returnvals[0]=(float)(parse.interp(str)*speed);
+         str=yexp.replaceAll("x","("+Double.toString(xpos)+")");
+         str=str.replaceAll("y","("+Double.toString(ypos)+")");
+         returnvals[1]=(float)(parse.interp(str)*speed);
+         return(returnvals);
+    }
     public void velocityUpdate(String xexp,String yexp){
          xexp=parse.correctSyntax(xexp);
          yexp=parse.correctSyntax(yexp);
@@ -51,7 +63,7 @@ public class Particle{
     public void posUpdate(){
         this.xpos+=velocity.xpos;
         this.ypos+=velocity.ypos;
-        if(trail.size()<500){
+        if(trail.size()<300){
         trail.add(new Vector(xpos,ypos));}
         else{ trail.remove(0); trail.add(new Vector(xpos,ypos));}
     }
